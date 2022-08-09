@@ -1,4 +1,75 @@
 import { galleryItems } from './gallery-items.js';
 // Change code below this line
 
-console.log(galleryItems);
+// console.log(galleryItems);
+/*
+Створення і рендер розмітки на підставі масиву даних galleryItems 
+і наданого шаблону елемента галереї.
+Реалізація делегування на div.gallery і отримання url великого зображення.
+Підключення скрипту і стилів бібліотеки модального вікна basicLightbox.
+ Використовуй CDN сервіс jsdelivr і додай у проект посилання на мініфіковані (.min) файли бібліотеки.
+Відкриття модального вікна по кліку на елементі галереї.
+ Для цього ознайомся з документацією і прикладами.
+Заміна значення атрибута src елемента <img> в модальному вікні перед відкриттям. 
+Використовуй готову розмітку модального вікна із зображенням з прикладів бібліотеки basicLightbox.
+*/
+const galleryCollectionConteinerEl = document.querySelector('.gallery');
+
+
+
+
+const galleryCollectionHtml = galleryItems.map(({ preview: previewImg, original: originalImg, description: alt, }) => {
+    return `
+     <div class="gallery__item">
+    <a class="gallery__link" href="${originalImg}">
+        <img
+            class="gallery__image"
+            src="${previewImg}"
+            data-source="${originalImg}"
+            alt="${alt}"
+        />
+    </a>
+</div>
+`
+}).join('');
+
+let modal = null;
+
+galleryCollectionConteinerEl.insertAdjacentHTML("beforeend", galleryCollectionHtml);
+
+galleryCollectionConteinerEl.addEventListener('click', onImageClick);
+
+galleryCollectionConteinerEl.addEventListener('keydown', onKeyPress);
+
+
+function onImageClick(event) {
+    event.preventDefault();
+
+    if (event.target.nodeName !== "IMG") {
+        return
+    }
+
+    const imageLink = event.target.dataset.source;
+    const imageAlt = event.target.getAttribute('alt');
+
+    modal = basicLightbox.create(` <img src="${imageLink}" alt = "${imageAlt}"> `);
+
+    modal.show();
+
+
+}
+
+function onKeyEscPress(event) {
+    if (!modal.visible()) {
+        return galleryCollectionConteinerEl.removeEventListener('keydown', onKeyPress);
+    }
+
+    if (event.code === "Escape") {
+        modal.close();
+    }
+}
+
+function onKeyPress(event) {
+    onKeyEscPress(event);
+}
+
